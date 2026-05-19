@@ -922,6 +922,29 @@
             }
         }
 
+        /**
+         * Extract ALL unique columns from entire dataset
+         * Handles cases where first row is empty or missing columns
+         */
+        function getAllColumnsFromData(data) {
+            const columnSet = new Set();
+            
+            // Scan all rows to capture every column that exists
+            data.forEach((row, index) => {
+                if (row && typeof row === 'object') {
+                    Object.keys(row).forEach(col => {
+                        // Only add non-empty column names
+                        if (col && String(col).trim() !== '') {
+                            columnSet.add(col);
+                        }
+                    });
+                }
+            });
+            
+            // Convert set to sorted array for consistent ordering
+            return Array.from(columnSet).sort();
+        }
+
         function loadData(data, fileName) {
             document.getElementById('uploadProgress').classList.add('hidden');
             
@@ -931,7 +954,7 @@
             }
 
             rawData = data;
-            availableColumns = Object.keys(data[0] || {});
+            availableColumns = getAllColumnsFromData(data);
 
             showAlert(`Loaded ${data.length} rows and ${availableColumns.length} columns.`, 'success');
             
